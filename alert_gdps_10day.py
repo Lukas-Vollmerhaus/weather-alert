@@ -140,7 +140,7 @@ def Alert_GDPS_10day(location):
     weekend_data_list,start_weekend_list,index = find_weekends(data)
     first_weekend,first_weekend_date, second_weekend, second_weekend_date, second_weekend_partial = assess_weekends(data,weekend_data_list,start_weekend_list,index)
 
-    print("First weekend is good? %r, Second weekend is good? %r, Second weekend is partial? %r" % (first_weekend,second_weekend,second_weekend_partial))
+    print("GDPS %s First weekend is good? %r, Second weekend is good? %r, Second weekend is partial? %r" % (location.name,first_weekend,second_weekend,second_weekend_partial))
 
     return first_weekend, first_weekend_date, second_weekend, second_weekend_date, second_weekend_partial
 

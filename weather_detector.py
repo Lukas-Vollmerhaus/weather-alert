@@ -4,6 +4,7 @@ import os,sys
 import configparser
 from alert_gdps_10day import Alert_GDPS_10day
 from alert_gfs_10day import Alert_GFS_10day
+from alert_rdps_3day import Alert_RDPS_3day
 from slack_sdk import WebClient
 
 
@@ -28,6 +29,7 @@ LOCATION_LIST = [location("Bugaboos",50.738045,-116.768606),
 
 GDPS_RESULT_LIST = []
 GFS_RESULT_LIST = []
+RDPS_RESULT_LIST = []
 
 def slack_alert(message):
     weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
@@ -64,8 +66,15 @@ def alert():
             slack_alert(message)
 
     for result in GFS_RESULT_LIST:
+        
         if result.good_weather:
             message = "Weather window detected by GFS at %s for 48hrs starting %s" % (result.location.name, result.date)
+            slack_alert(message)
+
+    for result in RDPS_RESULT_LIST:
+        print(result.date, result.good_weather, result.partial, result.location.name)
+        if result.good_weather:
+            message = "Weather window detected by RDPS at %s for 48hrs starting %s" % (result.location.name, result.date)
             slack_alert(message)
 
 def main():
@@ -78,10 +87,18 @@ def main():
         GFS_RESULT_LIST.append(result(first_weekend_date,first_weekend_good,False,loc))
         GFS_RESULT_LIST.append(result(second_weekend_date,second_weekend_good,second_weekend_partial,loc))
 
+        weekend_good,weekend_date,weekend_partial = Alert_RDPS_3day(loc)
+        if weekend_date == False: #weekend data was not found
+            continue
+        else:
+            RDPS_RESULT_LIST.append(result(weekend_date,weekend_good,weekend_partial,loc))
+
     if len(GDPS_RESULT_LIST) == 0:
         slack_error("No results returned for GDPS forecast")
     if len(GFS_RESULT_LIST) == 0:
         slack_error("No results returned for GFS forecast")   
+    if len(RDPS_RESULT_LIST) == 0:
+        slack_error("No results returned for RDPS forecast")        
 
     alert()
 
