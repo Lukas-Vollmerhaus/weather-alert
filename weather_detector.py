@@ -34,7 +34,7 @@ GFS_RESULT_LIST = []
 RDPS_RESULT_LIST = []
 NAM_RESULT_LIST = []
 
-brick_tamland = "xoxb-7015922744519-7028590296021-UE547noeSdKPQPYvam2qnVmt"
+brick_tamland = ""
 
 def slack_alert(message):
     weather_alert_bot_token = brick_tamland
