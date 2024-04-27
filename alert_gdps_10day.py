@@ -19,8 +19,10 @@ MAX_TEMPERATURE_THRESHOLD = 30
 MAX_PRECIP_THRESHOLD = 0   #mm rain // cm snow 
 MAX_WIND_THRESHOLD = 10  #km/h 
 
+brick_tamland = "xoxb-7015922744519-7028590296021-UE547noeSdKPQPYvam2qnVmt"
+
 def slack_alert(message):
-    weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
+    weather_alert_bot_token = brick_tamland
     channel_name = "weather-alert"
     client = WebClient(token=weather_alert_bot_token)
     result = client.chat_postMessage(channel=channel_name,text=message)
@@ -28,7 +30,7 @@ def slack_alert(message):
     return result
 
 def slack_update(message):
-    weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
+    weather_alert_bot_token = brick_tamland
     channel_name = "weather-update"
     client = WebClient(token=weather_alert_bot_token)
     result = client.chat_postMessage(channel=channel_name,text=message)
@@ -36,7 +38,7 @@ def slack_update(message):
     return result
 
 def slack_error(message):
-    weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
+    weather_alert_bot_token = brick_tamland
     channel_name = "error-message"
     client = WebClient(token=weather_alert_bot_token)
     result = client.chat_postMessage(channel=channel_name,text=message)

@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-
 import os,sys
 import pandas as pd
 from datetime import datetime
@@ -67,25 +66,20 @@ def get_csv(URL_STRING):
     os.remove(CSV_PATH)
     return(data)
 
-def find_weekends(data):
+def find_weekend(data):
     index = 0
     weekend_data_list = []
     weekend_found = False
-    start_weekend_list = []
 
     for day in data['DATETIME']:
         if day.weekday() == 5 or day.weekday() == 6: #saturday
             if not weekend_found:
-                start_weekend_list.append(index)
                 weekend_found = True
             weekend_data_list.append(index)
-            
-        if weekend_found:
-            if (index - start_weekend_list[-1]) >= 48: #48 data points per weekend for GFS 10day
-                weekend_found = False
+
         index = index + 1
         
-    return(weekend_data_list,start_weekend_list,index)
+    return(weekend_data_list,weekend_found,index)
 
 def evaluate_thresholds(weekend_data):
     weekend_good = True
@@ -100,52 +94,51 @@ def evaluate_thresholds(weekend_data):
     slack_update("cloud %f temp %f ws %f precip %f" % (avg_cloud,avg_temp,avg_ws,total_precip))
     return(weekend_good)
 
-def assess_weekends(data,weekend_data_list,start_weekend_list,index):
-    
-    second_weekend_partial = False
-    if start_weekend_list[0] != 0: #weekend isn't today
-        first_weekend_index = start_weekend_list[0]
-        weekend_data = data.iloc[first_weekend_index:first_weekend_index+48]
-        print("First weekend")
-        first_weekend_good = evaluate_thresholds(weekend_data)
-        first_weekend_date = weekend_data['DATETIME'][first_weekend_index]
+def assess_weekends(data,weekend_data_list,index):
+    weekend_partial = False
+
+    if weekend_data_list[0] != 0: #weekend isn't today
+        weekend_index = weekend_data_list[0]
+
+        if index - weekend_index >= 48: #data contains entire weekend
+            weekend_data = data.iloc[weekend_index:weekend_index+48]
+            weekend_good = evaluate_thresholds(weekend_data)
+            weekend_date = weekend_data['DATETIME'][weekend_index]
+
+        else: #report on partial weekend
+            weekend_data = data.iloc[weekend_index:-1] #get available data
+            weekend_good = evaluate_thresholds(weekend_data)
+            weekend_date = weekend_data['DATETIME'][weekend_index]
+            weekend_partial = True
+
         
     else:
-        first_weekend_good = False #don't report a weekend thats already happening
+        weekend_good = False #don't report a weekend thats already happening
         print("first weekend happening now")
         
-    second_weekend_index = start_weekend_list[1]
+   
+    return(weekend_good,weekend_date,weekend_partial)
 
-    if index - second_weekend_index < 48: #partial weekend
-        second_weekend_partial = True
-        weekend_data = data.iloc[second_weekend_index:]
-        print("Second weekend")
-        second_weekend_good = evaluate_thresholds(weekend_data)
-        second_weekend_date = weekend_data['DATETIME'][second_weekend_index]
-        
-    else:
-        weekend_data = data.iloc[second_weekend_index:]
-        print("Second weekend")
-        second_weekend_good = evaluate_thresholds(weekend_data)
-        second_weekend_date = weekend_data['DATETIME'][second_weekend_index]
+def Alert_NAM_3day(location):
+    NAM_3DAY = "https://spotwx.com/products/grib_index.php?model=nam_awphys&lat=XXXX&lon=YYYY&tz=America/Edmonton&display=table"
+    slack_update(location.name + " NAM")
+    slack_update(NAM_3DAY)
+    NAM_3DAY = NAM_3DAY.replace("XXXX",str(location.lat))
+    NAM_3DAY = NAM_3DAY.replace("YYYY",str(location.long))
+    print(NAM_3DAY)
+    data = get_csv(NAM_3DAY)
+    weekend_data_list,weekend_found,index = find_weekend(data)
 
-    return(first_weekend_good,first_weekend_date,second_weekend_good,second_weekend_date, second_weekend_partial)
+    if not weekend_found:
+        slack_update("No weekend in current model")
+        sys.exit(0,0,0)
 
-def Alert_GFS_10day(location):
-    GFS_10DAY = "https://spotwx.com/products/grib_index.php?model=gfs_pgrb2_0p25_f&lat=XXXX&lon=YYYY&tz=America/Edmonton&display=table"
-    slack_update(location.name + " GFS")
-    slack_update(GFS_10DAY)
-    GFS_10DAY = GFS_10DAY.replace("XXXX",str(location.lat))
-    GFS_10DAY = GFS_10DAY.replace("YYYY",str(location.long))
-    print(GFS_10DAY)
-    data = get_csv(GFS_10DAY)
-    weekend_data_list,start_weekend_list,index = find_weekends(data)
-    first_weekend,first_weekend_date, second_weekend, second_weekend_date, second_weekend_partial = assess_weekends(data,weekend_data_list,start_weekend_list,index)
+    weekend,weekend_date, weekend_partial = assess_weekends(data,weekend_data_list,index)
 
-    print("GFS %s First weekend is good? %r, Second weekend is good? %r, Second weekend is partial? %r" % (location.name,first_weekend,second_weekend,second_weekend_partial))
+    print("NAM %s Weekend is good? %r, weekend is partial? %r" % (location.name,weekend,weekend_partial))
 
-    return first_weekend, first_weekend_date, second_weekend, second_weekend_date, second_weekend_partial
+    return weekend, weekend_date, weekend_partial
 
-if (__name__ == '__Alert_GFS_10day__'):
-    main_exit = Alert_GFS_10day()
+if (__name__ == '__Alert_NAM_3day__'):
+    main_exit = Alert_NAM_3day()
     sys.exit(main_exit)

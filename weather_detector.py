@@ -5,6 +5,7 @@ import configparser
 from alert_gdps_10day import Alert_GDPS_10day
 from alert_gfs_10day import Alert_GFS_10day
 from alert_rdps_3day import Alert_RDPS_3day
+from alert_nam_3day import Alert_NAM_3day
 from slack_sdk import WebClient
 
 
@@ -25,14 +26,18 @@ class result:
 
 LOCATION_LIST = [location("Bugaboos",50.738045,-116.768606),
                  location("Spillimacheen",50.90827,-116.44277),
-                 location("Stone hill",48.792848,-115.297972)]
+                 location("Stone hill",48.792848,-115.297972),
+                 location("Skaha Bluffs",49.427895,-119.560863)]
 
 GDPS_RESULT_LIST = []
 GFS_RESULT_LIST = []
 RDPS_RESULT_LIST = []
+NAM_RESULT_LIST = []
+
+brick_tamland = "xoxb-7015922744519-7028590296021-UE547noeSdKPQPYvam2qnVmt"
 
 def slack_alert(message):
-    weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
+    weather_alert_bot_token = brick_tamland
     channel_name = "weather-alert"
     client = WebClient(token=weather_alert_bot_token)
     result = client.chat_postMessage(channel=channel_name,text=message)
@@ -40,7 +45,7 @@ def slack_alert(message):
     return result
 
 def slack_message(message):
-    weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
+    weather_alert_bot_token = brick_tamland
     channel_name = "weather-alert"
     bot_user = "weather alert"
     client = WebClient(token=weather_alert_bot_token)
@@ -50,7 +55,7 @@ def slack_message(message):
     return result
 
 def slack_error(message):
-    weather_alert_bot_token = "xoxb-7015922744519-7028590296021-2f2cwlMpDI2Y4xJwlK1b2XPS"
+    weather_alert_bot_token = brick_tamland
     channel_name = "error-message"
     bot_user = "weather alert"
     client = WebClient(token=weather_alert_bot_token)
@@ -92,6 +97,13 @@ def main():
             continue
         else:
             RDPS_RESULT_LIST.append(result(weekend_date,weekend_good,weekend_partial,loc))
+
+        
+        weekend_good,weekend_date,weekend_partial = Alert_NAM_3day(loc)
+        if weekend_date == False: #weekend data was not found
+            continue
+        else:
+            NAM_RESULT_LIST.append(result(weekend_date,weekend_good,weekend_partial,loc))
 
     if len(GDPS_RESULT_LIST) == 0:
         slack_error("No results returned for GDPS forecast")

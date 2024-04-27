@@ -1354,3 +1354,497 @@ Read port: 35703
 console.error: ({})
 DevTools listening on ws://127.0.0.1:38009/devtools/browser/a78dfe98-6d61-44a9-be8d-096c8265aa69
 1714173891917	Marionette	INFO	Stopped listening on port 35703
+1714187859416	geckodriver	INFO	Listening on 127.0.0.1:52893
+1714187859926	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "45595" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileW6rRwx"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187864160	Marionette	INFO	Marionette enabled
+1714187864423	Marionette	INFO	Listening on port 35691
+Read port: 35691
+WebDriver BiDi listening on ws://127.0.0.1:45595
+1714187864660	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:45595/devtools/browser/942fb0b5-9978-42de-b032-b4f0f93ccad2
+1714187872880	Marionette	INFO	Stopped listening on port 35691
+1714187876680	geckodriver	INFO	Listening on 127.0.0.1:58901
+1714187877190	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "50537" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileVMcNzS"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187881509	Marionette	INFO	Marionette enabled
+1714187881770	Marionette	INFO	Listening on port 46271
+Read port: 46271
+WebDriver BiDi listening on ws://127.0.0.1:50537
+1714187882044	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:50537/devtools/browser/5b3d262a-7027-4a41-8f66-e83dac48f622
+1714187889894	Marionette	INFO	Stopped listening on port 46271
+1714187893480	geckodriver	INFO	Listening on 127.0.0.1:43057
+1714187893992	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "37771" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileQmA1Ac"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187898239	Marionette	INFO	Marionette enabled
+1714187898503	Marionette	INFO	Listening on port 34735
+Read port: 34735
+WebDriver BiDi listening on ws://127.0.0.1:37771
+1714187898744	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:37771/devtools/browser/ff71b6e6-0c4f-416d-bf04-34cf133a97fe
+1714187906015	Marionette	INFO	Stopped listening on port 34735
+1714187909571	geckodriver	INFO	Listening on 127.0.0.1:33503
+1714187909581	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "50335" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofiletHXrWY"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187913965	Marionette	INFO	Marionette enabled
+1714187914228	Marionette	INFO	Listening on port 34089
+WebDriver BiDi listening on ws://127.0.0.1:50335
+Read port: 34089
+1714187914929	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:50335/devtools/browser/5b844ffe-626f-4e8d-90c4-c5759cf6fdd3
+1714187922561	Marionette	INFO	Stopped listening on port 34089
+1714187926458	geckodriver	INFO	Listening on 127.0.0.1:52995
+1714187926968	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "35393" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile75x5ZU"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187931200	Marionette	INFO	Marionette enabled
+1714187931462	Marionette	INFO	Listening on port 36977
+Read port: 36977
+WebDriver BiDi listening on ws://127.0.0.1:35393
+1714187931704	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:35393/devtools/browser/6e7891e3-acb4-42ad-9611-f0614a370db1
+1714187939423	Marionette	INFO	Stopped listening on port 36977
+1714187943282	geckodriver	INFO	Listening on 127.0.0.1:35339
+1714187943793	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "50155" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilemEot43"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187948063	Marionette	INFO	Marionette enabled
+1714187948324	Marionette	INFO	Listening on port 46397
+WebDriver BiDi listening on ws://127.0.0.1:50155
+Read port: 46397
+1714187949090	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:50155/devtools/browser/7375b7eb-a412-4659-9f59-3343bbf45199
+1714187955891	Marionette	INFO	Stopped listening on port 46397
+1714187959336	geckodriver	INFO	Listening on 127.0.0.1:58839
+1714187959845	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "48357" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileODbpj8"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187964100	Marionette	INFO	Marionette enabled
+1714187964370	Marionette	INFO	Listening on port 36309
+Read port: 36309
+WebDriver BiDi listening on ws://127.0.0.1:48357
+1714187964619	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:48357/devtools/browser/1289435f-dcf4-4dd6-81d0-1e57740a561c
+1714187972649	Marionette	INFO	Stopped listening on port 36309
+1714187976517	geckodriver	INFO	Listening on 127.0.0.1:53127
+1714187977025	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "57543" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileQ84r1k"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187981292	Marionette	INFO	Marionette enabled
+1714187981560	Marionette	INFO	Listening on port 41481
+WebDriver BiDi listening on ws://127.0.0.1:57543
+Read port: 41481
+1714187982262	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:57543/devtools/browser/0d3ffbdf-240d-4759-85b2-8fccfa0bb418
+1714187989627	Marionette	INFO	Stopped listening on port 41481
+1714187993463	geckodriver	INFO	Listening on 127.0.0.1:56395
+1714187993973	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "52755" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofiledaoa8H"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714187998228	Marionette	INFO	Marionette enabled
+1714187998490	Marionette	INFO	Listening on port 34017
+Read port: 34017
+WebDriver BiDi listening on ws://127.0.0.1:52755
+1714187998737	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:52755/devtools/browser/8655f0fb-7293-4441-827b-911955fdc5e8
+1714188005999	Marionette	INFO	Stopped listening on port 34017
+1714188098683	geckodriver	INFO	Listening on 127.0.0.1:38513
+1714188099194	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "33097" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilelcqAMA"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188103471	Marionette	INFO	Marionette enabled
+1714188103733	Marionette	INFO	Listening on port 39441
+WebDriver BiDi listening on ws://127.0.0.1:33097
+Read port: 39441
+1714188104432	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:33097/devtools/browser/a935aeac-c09c-4b63-befb-b633eeb91f71
+1714188111754	Marionette	INFO	Stopped listening on port 39441
+1714188115511	geckodriver	INFO	Listening on 127.0.0.1:36207
+1714188116020	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "35407" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile2JwcVd"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188120297	Marionette	INFO	Marionette enabled
+1714188120554	Marionette	INFO	Listening on port 46069
+WebDriver BiDi listening on ws://127.0.0.1:35407
+Read port: 46069
+1714188121265	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:35407/devtools/browser/744b8fae-dfa2-4b9a-a842-5a42640711b2
+1714188128472	Marionette	INFO	Stopped listening on port 46069
+1714188132133	geckodriver	INFO	Listening on 127.0.0.1:35533
+1714188132643	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "60027" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofiledX3J6T"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188136916	Marionette	INFO	Marionette enabled
+1714188137187	Marionette	INFO	Listening on port 43703
+WebDriver BiDi listening on ws://127.0.0.1:60027
+Read port: 43703
+1714188137899	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:60027/devtools/browser/74e316ce-b5f5-412f-a5e9-ada5afb9dcb0
+1714188144708	Marionette	INFO	Stopped listening on port 43703
+1714188148234	geckodriver	INFO	Listening on 127.0.0.1:52221
+1714188148744	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "53737" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilezJ76ng"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188153000	Marionette	INFO	Marionette enabled
+1714188153261	Marionette	INFO	Listening on port 41505
+Read port: 41505
+WebDriver BiDi listening on ws://127.0.0.1:53737
+1714188153502	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:53737/devtools/browser/0206aba0-c534-40b4-96fc-588ae4c06049
+1714188161573	Marionette	INFO	Stopped listening on port 41505
+1714188165272	geckodriver	INFO	Listening on 127.0.0.1:41227
+1714188165782	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "40389" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile79K0x5"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188170095	Marionette	INFO	Marionette enabled
+1714188170362	Marionette	INFO	Listening on port 46775
+WebDriver BiDi listening on ws://127.0.0.1:40389
+Read port: 46775
+1714188171047	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:40389/devtools/browser/c82642fb-00db-4bf3-9150-a97904e0ea67
+1714188178608	Marionette	INFO	Stopped listening on port 46775
+1714188182326	geckodriver	INFO	Listening on 127.0.0.1:43005
+1714188182838	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "57069" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilen7ULR3"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188187097	Marionette	INFO	Marionette enabled
+1714188187384	Marionette	INFO	Listening on port 36411
+WebDriver BiDi listening on ws://127.0.0.1:57069
+Read port: 36411
+1714188188093	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:57069/devtools/browser/6bcc6af2-8029-4602-af1d-ff577841fc3f
+1714188194874	Marionette	INFO	Stopped listening on port 36411
+1714188198323	geckodriver	INFO	Listening on 127.0.0.1:43433
+1714188198833	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "42297" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile148gow"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188203125	Marionette	INFO	Marionette enabled
+1714188203388	Marionette	INFO	Listening on port 44413
+WebDriver BiDi listening on ws://127.0.0.1:42297
+Read port: 44413
+1714188204089	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:42297/devtools/browser/d1825aa0-25ec-4f01-ba5b-52dc06efa233
+1714188211618	Marionette	INFO	Stopped listening on port 44413
+1714188215401	geckodriver	INFO	Listening on 127.0.0.1:45889
+1714188215914	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "52577" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileExhUMK"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188220203	Marionette	INFO	Marionette enabled
+1714188220466	Marionette	INFO	Listening on port 46249
+WebDriver BiDi listening on ws://127.0.0.1:52577
+Read port: 46249
+1714188221154	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:52577/devtools/browser/641310c2-4f5e-4562-bf0c-d529cb9d189b
+1714188228638	Marionette	INFO	Stopped listening on port 46249
+1714188232556	geckodriver	INFO	Listening on 127.0.0.1:36607
+1714188233067	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "46165" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile0R8rIS"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188237326	Marionette	INFO	Marionette enabled
+1714188237590	Marionette	INFO	Listening on port 45789
+Read port: 45789
+WebDriver BiDi listening on ws://127.0.0.1:46165
+1714188237826	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:46165/devtools/browser/2c77bf99-95d9-4282-a4e5-9dddb6d3941f
+1714188245184	Marionette	INFO	Stopped listening on port 45789
+1714188248733	geckodriver	INFO	Listening on 127.0.0.1:36733
+1714188249242	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "55515" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileFSUDgc"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188253527	Marionette	INFO	Marionette enabled
+1714188253794	Marionette	INFO	Listening on port 43493
+WebDriver BiDi listening on ws://127.0.0.1:55515
+Read port: 43493
+1714188254493	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:55515/devtools/browser/e337ccf4-b8b8-46c0-9330-e5361b0637aa
+1714188262253	Marionette	INFO	Stopped listening on port 43493
+1714188265974	geckodriver	INFO	Listening on 127.0.0.1:54147
+1714188266485	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "51715" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilegA1krE"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188270744	Marionette	INFO	Marionette enabled
+1714188271003	Marionette	INFO	Listening on port 35823
+Read port: 35823
+WebDriver BiDi listening on ws://127.0.0.1:51715
+1714188271241	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:51715/devtools/browser/783af47c-3789-4c70-b8d3-096f0818da42
+1714188278918	Marionette	INFO	Stopped listening on port 35823
+1714188282513	geckodriver	INFO	Listening on 127.0.0.1:39105
+1714188283025	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "44817" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileOIJecr"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188287313	Marionette	INFO	Marionette enabled
+1714188287575	Marionette	INFO	Listening on port 42015
+WebDriver BiDi listening on ws://127.0.0.1:44817
+Read port: 42015
+1714188288260	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:44817/devtools/browser/e8da90ff-0a67-4d93-af9a-3b6093b4ec61
+1714188295340	Marionette	INFO	Stopped listening on port 42015
+1714188804407	geckodriver	INFO	Listening on 127.0.0.1:49985
+1714188804917	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "50511" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileLfNhiE"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188809217	Marionette	INFO	Marionette enabled
+1714188809478	Marionette	INFO	Listening on port 34347
+WebDriver BiDi listening on ws://127.0.0.1:50511
+Read port: 34347
+1714188810164	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:50511/devtools/browser/10db5bbd-00cd-495c-b185-485926f45047
+1714188817480	Marionette	INFO	Stopped listening on port 34347
+1714188821265	geckodriver	INFO	Listening on 127.0.0.1:60255
+1714188821777	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "46607" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileYY9ARc"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188826065	Marionette	INFO	Marionette enabled
+1714188826330	Marionette	INFO	Listening on port 33649
+WebDriver BiDi listening on ws://127.0.0.1:46607
+Read port: 33649
+1714188827033	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:46607/devtools/browser/47b29643-f332-4430-9716-b6c3f5ac5f4b
+1714188834657	Marionette	INFO	Stopped listening on port 33649
+1714188838382	geckodriver	INFO	Listening on 127.0.0.1:58643
+1714188838893	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "56435" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilebTJyGf"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188843147	Marionette	INFO	Marionette enabled
+1714188843408	Marionette	INFO	Listening on port 37585
+Read port: 37585
+WebDriver BiDi listening on ws://127.0.0.1:56435
+1714188843653	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:56435/devtools/browser/28f6e5af-3686-432c-ae72-c9a9dda54dc5
+1714188850821	Marionette	INFO	Stopped listening on port 37585
+1714188854424	geckodriver	INFO	Listening on 127.0.0.1:59037
+1714188854935	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "37823" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilepupomr"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714188859204	Marionette	INFO	Marionette enabled
+1714188859471	Marionette	INFO	Listening on port 46881
+WebDriver BiDi listening on ws://127.0.0.1:37823
+Read port: 46881
+1714188860220	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:37823/devtools/browser/3a0dd0bd-346f-4e56-82a9-8695a7531d21
+console.error: "update.locale" " file doesn't exist in either the application or GRE directories"
+1714188889774	addons.xpi	ERROR	System addon update list error SyntaxError: XMLHttpRequest.open: 'http://%(server)s/dummy-system-addons.xml' is not a valid URL.
+1714188926744	Marionette	INFO	Stopped listening on port 46881
+1714189075111	geckodriver	INFO	Listening on 127.0.0.1:33575
+1714189075624	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "56511" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile0woWbF"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189079842	Marionette	INFO	Marionette enabled
+1714189080102	Marionette	INFO	Listening on port 45315
+Read port: 45315
+WebDriver BiDi listening on ws://127.0.0.1:56511
+1714189080355	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:56511/devtools/browser/56b78a2d-263d-4a90-b238-c9b143128697
+1714189088650	Marionette	INFO	Stopped listening on port 45315
+1714189092373	geckodriver	INFO	Listening on 127.0.0.1:44979
+1714189092884	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "47771" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileUaM9jl"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189097151	Marionette	INFO	Marionette enabled
+1714189097413	Marionette	INFO	Listening on port 39937
+WebDriver BiDi listening on ws://127.0.0.1:47771
+Read port: 39937
+1714189098169	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:47771/devtools/browser/6ad923fa-3c23-4d43-b54f-93312b70c56c
+1714189105982	Marionette	INFO	Stopped listening on port 39937
+1714189109708	geckodriver	INFO	Listening on 127.0.0.1:37945
+1714189110219	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "37109" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilegt5Nf5"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189114486	Marionette	INFO	Marionette enabled
+1714189114746	Marionette	INFO	Listening on port 38117
+Read port: 38117
+WebDriver BiDi listening on ws://127.0.0.1:37109
+1714189114986	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:37109/devtools/browser/8e49365f-956a-4486-a241-f4599bbd2f9a
+1714189122176	Marionette	INFO	Stopped listening on port 38117
+1714189125793	geckodriver	INFO	Listening on 127.0.0.1:35957
+1714189126304	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "46295" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile03Iigx"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189130495	Marionette	INFO	Marionette enabled
+1714189130757	Marionette	INFO	Listening on port 42513
+WebDriver BiDi listening on ws://127.0.0.1:46295
+Read port: 42513
+1714189131441	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:46295/devtools/browser/71b35a5f-cb92-465f-9f64-035c4ff3b549
+1714189138287	Marionette	INFO	Stopped listening on port 42513
+1714189142016	geckodriver	INFO	Listening on 127.0.0.1:39565
+1714189142527	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "56121" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileAaitjh"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189146827	Marionette	INFO	Marionette enabled
+1714189147094	Marionette	INFO	Listening on port 46799
+WebDriver BiDi listening on ws://127.0.0.1:56121
+Read port: 46799
+1714189147800	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:56121/devtools/browser/a9d93d32-8d15-4d81-a630-c9998120bf58
+1714189155425	Marionette	INFO	Stopped listening on port 46799
+1714189159130	geckodriver	INFO	Listening on 127.0.0.1:48517
+1714189159641	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "44935" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileGtbpgq"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189163911	Marionette	INFO	Marionette enabled
+1714189164180	Marionette	INFO	Listening on port 45533
+WebDriver BiDi listening on ws://127.0.0.1:44935
+Read port: 45533
+1714189164994	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:44935/devtools/browser/f832de69-1309-4533-836b-da7da6b19b86
+1714189172270	Marionette	INFO	Stopped listening on port 45533
+1714189175944	geckodriver	INFO	Listening on 127.0.0.1:46291
+1714189176454	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "54293" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileWAnxzv"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189180732	Marionette	INFO	Marionette enabled
+1714189181005	Marionette	INFO	Listening on port 39359
+WebDriver BiDi listening on ws://127.0.0.1:54293
+Read port: 39359
+1714189181696	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:54293/devtools/browser/5b4ae0cc-1c56-456f-b52b-0ba00ad69825
+1714189188686	Marionette	INFO	Stopped listening on port 39359
+1714189192114	geckodriver	INFO	Listening on 127.0.0.1:35433
+1714189192623	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "59709" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilezrTnR1"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189196851	Marionette	INFO	Marionette enabled
+1714189197107	Marionette	INFO	Listening on port 35907
+Read port: 35907
+WebDriver BiDi listening on ws://127.0.0.1:59709
+1714189197353	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:59709/devtools/browser/fc5c4832-3650-4615-8faf-226d178fc5d9
+1714189204611	Marionette	INFO	Stopped listening on port 35907
+1714189208303	geckodriver	INFO	Listening on 127.0.0.1:49597
+1714189208813	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "39957" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofiled8z0R6"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189213105	Marionette	INFO	Marionette enabled
+1714189213364	Marionette	INFO	Listening on port 34067
+WebDriver BiDi listening on ws://127.0.0.1:39957
+Read port: 34067
+1714189214057	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:39957/devtools/browser/7f04e9c2-cbcf-4240-8f25-1e1ddba52a63
+1714189221832	Marionette	INFO	Stopped listening on port 34067
+1714189225567	geckodriver	INFO	Listening on 127.0.0.1:40783
+1714189226079	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "59381" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileFxTUBc"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189230262	Marionette	INFO	Marionette enabled
+1714189230518	Marionette	INFO	Listening on port 36069
+WebDriver BiDi listening on ws://127.0.0.1:59381
+Read port: 36069
+1714189231190	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:59381/devtools/browser/8856124b-8b99-41ce-ac2b-e8fd51824c47
+1714189238488	Marionette	INFO	Stopped listening on port 36069
+1714189242209	geckodriver	INFO	Listening on 127.0.0.1:42225
+1714189242721	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "39711" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilehdo3xz"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189246998	Marionette	INFO	Marionette enabled
+1714189247260	Marionette	INFO	Listening on port 34331
+WebDriver BiDi listening on ws://127.0.0.1:39711
+Read port: 34331
+1714189248026	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:39711/devtools/browser/8d4610ea-7943-4b2a-b0c4-b8306ad32498
+1714189254890	Marionette	INFO	Stopped listening on port 34331
+1714189258330	geckodriver	INFO	Listening on 127.0.0.1:45059
+1714189258841	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "55997" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileHm2J82"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189263126	Marionette	INFO	Marionette enabled
+1714189263391	Marionette	INFO	Listening on port 45191
+WebDriver BiDi listening on ws://127.0.0.1:55997
+Read port: 45191
+1714189264146	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:55997/devtools/browser/770df5a9-788f-45c2-a568-8a8d2b87a0d6
+1714189270847	Marionette	INFO	Stopped listening on port 45191
+1714189274525	geckodriver	INFO	Listening on 127.0.0.1:48537
+1714189275035	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "33025" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilexGKiLL"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189279354	Marionette	INFO	Marionette enabled
+1714189279620	Marionette	INFO	Listening on port 39605
+Read port: 39605
+WebDriver BiDi listening on ws://127.0.0.1:33025
+1714189279862	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:33025/devtools/browser/b332698b-b6b7-48cf-b98e-ccb9f028e20a
+1714189288133	Marionette	INFO	Stopped listening on port 39605
+1714189291860	geckodriver	INFO	Listening on 127.0.0.1:39597
+1714189291870	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "44275" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilecgGlqJ"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189296217	Marionette	INFO	Marionette enabled
+1714189296495	Marionette	INFO	Listening on port 45533
+Read port: 45533
+WebDriver BiDi listening on ws://127.0.0.1:44275
+1714189296739	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:44275/devtools/browser/f4bd031a-759b-44fd-a3ea-f0c03cb058de
+1714189304755	Marionette	INFO	Stopped listening on port 45533
+1714189308371	geckodriver	INFO	Listening on 127.0.0.1:35421
+1714189308882	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "47309" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileOFXvPf"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189313177	Marionette	INFO	Marionette enabled
+1714189313440	Marionette	INFO	Listening on port 43437
+WebDriver BiDi listening on ws://127.0.0.1:47309
+Read port: 43437
+1714189314145	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:47309/devtools/browser/c908f88f-7798-471b-947a-c2fdf58a86bf
+1714189321110	Marionette	INFO	Stopped listening on port 43437
+1714189324627	geckodriver	INFO	Listening on 127.0.0.1:39101
+1714189325138	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/usr ... te" "--remote-debugging-port" "59729" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilehhLps9"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1714189329437	Marionette	INFO	Marionette enabled
+1714189329699	Marionette	INFO	Listening on port 42359
+WebDriver BiDi listening on ws://127.0.0.1:59729
+Read port: 42359
+1714189330389	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.error: ({})
+DevTools listening on ws://127.0.0.1:59729/devtools/browser/02a6c416-ec62-4559-a0e1-897ecfb03e1a
+1714189337130	Marionette	INFO	Stopped listening on port 42359
