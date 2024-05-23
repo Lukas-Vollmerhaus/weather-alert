@@ -71,7 +71,7 @@ def stepFunction(value, MIN_THRESHOLD, MAX_THRESHOLD):
     '''
     Returns a 0 if threshold values are not exceeded, else returns 1
     '''
-    if value < MAX_THRESHOLD and value > MAX_THRESHOLD:
+    if value < MAX_THRESHOLD and value > MIN_THRESHOLD:
         return 0
     else:
         return 1
