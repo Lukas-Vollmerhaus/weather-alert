@@ -364,14 +364,14 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     ax.set_aspect("equal")
     ax.axis("off")
 
-    fig.suptitle(f"Weather Quality by Location — {SEASON.title()}", fontsize=14,
+    fig.suptitle(f"Weather Quality by Location — {SEASON.title()}", fontsize=18,
                  fontweight="bold", y=0.995)
 
     for r, loc_name in enumerate(locations):
         y = n_locs - r - 1  # top-to-bottom
         # Row label
         ax.text(-0.2, y + 0.5, loc_name, ha="right", va="center",
-                fontsize=9, fontweight="bold")
+                fontsize=13, fontweight="bold")
         for c, date in enumerate(dates):
             score = pivot.loc[loc_name, date]
             color = fitness_cmap(norm(score)) if not pd.isna(score) else "#cccccc"
@@ -380,13 +380,13 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
             ax.add_patch(rect)
             if not pd.isna(score):
                 ax.text(c + 0.5, y + 0.5, f"{score:.1f}",
-                        ha="center", va="center", fontsize=7, color="black")
+                        ha="center", va="center", fontsize=11, color="black")
 
     # Column date labels
     for c, date in enumerate(dates):
         ax.text(c + 0.5, n_locs + 0.1,
                 pd.Timestamp(date).strftime("%a\n%b %d"),
-                ha="center", va="bottom", fontsize=7)
+                ha="center", va="bottom", fontsize=10)
 
     plt.tight_layout(rect=[0, 0, 0.91, 0.97])
 
@@ -394,11 +394,11 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     cbar_ax = fig.add_axes([0.92, 0.25, 0.02, 0.45])
     cb = fig.colorbar(mcm.ScalarMappable(norm=norm, cmap=fitness_cmap),
                       cax=cbar_ax, orientation="vertical")
-    cb.set_label("Weather Quality\n(lower = better)", fontsize=7)
+    cb.set_label("Weather Quality\n(lower = better)", fontsize=11)
     cb.set_ticks(np.linspace(min_score, max_score, 5))
-    cb.ax.tick_params(labelsize=6)
+    cb.ax.tick_params(labelsize=10)
     fig.text(0.5, 0.002, f"Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-             ha="center", va="bottom", fontsize=7, color="grey")
+             ha="center", va="bottom", fontsize=10, color="grey")
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     syslog.syslog(syslog.LOG_INFO, f"Saved summary plot to {path}")
