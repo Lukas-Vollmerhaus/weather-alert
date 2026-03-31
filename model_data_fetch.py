@@ -31,7 +31,9 @@ MODEL_CONFIG = {
     "NAM":  (FORECAST_ENDPOINT, "ncep_nam_conus",   3),
 }
 
-HOURLY_VARS = "temperature_2m,cloud_cover,wind_speed_10m,precipitation"
+HOURLY_VARS    = "temperature_2m,cloud_cover,wind_speed_10m,precipitation"
+FETCH_TIMEOUT  = 120
+FETCH_ATTEMPTS = 5
 
 
 def fetch_forecast(location, model):
@@ -65,15 +67,15 @@ def fetch_forecast(location, model):
         "timezone":       "America/Edmonton",
     }
 
-    for attempt in range(3):
+    for attempt in range(FETCH_ATTEMPTS):
         try:
-            response = requests.get(endpoint, params=params, timeout=60)
+            response = requests.get(endpoint, params=params, timeout=FETCH_TIMEOUT)
             response.raise_for_status()
             break
         except requests.exceptions.Timeout:
-            if attempt < 2:
+            if attempt < FETCH_ATTEMPTS - 1:
                 syslog.syslog(syslog.LOG_WARNING, f"Timeout on attempt {attempt + 1} for {model_id}, retrying...")
-                time.sleep(5)
+                time.sleep(10)
             else:
                 raise
     data = response.json()

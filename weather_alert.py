@@ -20,7 +20,14 @@ from email import encoders
 from model_data_fetch import load_locations, fetch_forecast, MODEL_CONFIG
 from weather_fitness import evaluate_weather_fitness, SEASON
 
-OUTPUT_PNG = "/tmp/weather_alert.png"
+OUTPUT_PNG  = "/tmp/weather_alert.png"
+SUMMARY_PNG = "/tmp/weather_alert_summary.png"
+
+EMAIL_CONF        = "/usr/local/src/weather-alert/email.conf"
+LOCATIONS_CONF    = "/usr/local/src/weather-alert/locations.conf"
+FITNESS_CONF_PATH = "/usr/local/src/weather-alert/weather_fitness.conf"
+
+RESET = "\033[0m"
 
 # Colour assigned to each model in plots
 MODEL_COLORS = {
@@ -116,8 +123,6 @@ def score_to_color(score, min_score, max_score):
     b = int(b1 + (b2 - b1) * local_t)
 
     return f"\033[38;2;{r};{g};{b}m"
-
-RESET = "\033[0m"
 
 def print_calendar(results):
     """
@@ -322,8 +327,6 @@ def plot_forecasts(all_data, results, path=OUTPUT_PNG):
     syslog.syslog(syslog.LOG_INFO, f"Saved detail plot to {path}")
 
 
-SUMMARY_PNG = "/tmp/weather_alert_summary.png"
-
 def plot_fitness_summary(results, path=SUMMARY_PNG):
     """
     Produce a calendar-style heatmap PNG: rows = locations, columns = dates,
@@ -382,11 +385,15 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
                 ax.text(c + 0.5, y + 0.5, f"{score:.1f}",
                         ha="center", va="center", fontsize=11, color="black")
 
-    # Column date labels
+    # Column date labels + weekend highlight
     for c, date in enumerate(dates):
         ax.text(c + 0.5, n_locs + 0.1,
                 pd.Timestamp(date).strftime("%a\n%b %d"),
                 ha="center", va="bottom", fontsize=10)
+        if pd.Timestamp(date).dayofweek >= 5:  # 5=Saturday, 6=Sunday
+            ax.add_patch(plt.Rectangle((c, 0), cell_w, n_locs,
+                                       facecolor="none", edgecolor="green",
+                                       linewidth=2.5, zorder=3))
 
     plt.tight_layout(rect=[0, 0, 0.91, 0.97])
 
@@ -403,11 +410,6 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     plt.close(fig)
     syslog.syslog(syslog.LOG_INFO, f"Saved summary plot to {path}")
 
-
-EMAIL_CONF = "/usr/local/src/weather-alert/email.conf"
-
-LOCATIONS_CONF  = "/usr/local/src/weather-alert/locations.conf"
-FITNESS_CONF_PATH = "/usr/local/src/weather-alert/weather_fitness.conf"
 
 def send_images(summary_png, detail_png, path=EMAIL_CONF):
     """

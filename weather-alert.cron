@@ -1,0 +1,2 @@
+CRON_TZ=America/Edmonton
+0 17 * * * lukas /home/lukas/miniconda3/envs/weather-alert/bin/python /usr/local/src/weather-alert/weather_alert.py
