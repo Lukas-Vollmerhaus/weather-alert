@@ -33,7 +33,7 @@ MODEL_CONFIG = {
 
 HOURLY_VARS    = "temperature_2m,cloud_cover,wind_speed_10m,precipitation"
 FETCH_TIMEOUT  = 120
-FETCH_ATTEMPTS = 5
+FETCH_ATTEMPTS = 10
 
 
 def fetch_forecast(location, model):
