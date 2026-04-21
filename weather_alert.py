@@ -76,19 +76,22 @@ def evaluate_all(all_data):
                 if len(day_data) < 2:
                     continue
                 try:
-                    score = evaluate_weather_fitness(day_data)
+                    score, top_contributor = evaluate_weather_fitness(day_data)
                 except Exception as e:
                     syslog.syslog(syslog.LOG_ERR, f"Could not score {loc_name} {model} {date}: {e}")
                     continue
                 daily_precip = day_data["APCP"].diff().fillna(0).sum()
+                daily_high_temp = day_data["TMP"].max()
                 records.append({
-                    "location":      loc_name,
-                    "model":         model,
-                    "date":          pd.Timestamp(date),
-                    "fitness_score": score,
-                    "precip_mm":     daily_precip,
+                    "location":        loc_name,
+                    "model":           model,
+                    "date":            pd.Timestamp(date),
+                    "fitness_score":   score,
+                    "top_contributor": top_contributor,
+                    "precip_mm":       daily_precip,
+                    "high_temp_c":     daily_high_temp,
                 })
-    return pd.DataFrame(records, columns=["location", "model", "date", "fitness_score", "precip_mm"])
+    return pd.DataFrame(records, columns=["location", "model", "date", "fitness_score", "top_contributor", "precip_mm", "high_temp_c"])
 
 
 def score_to_color(score, min_score, max_score):
@@ -131,6 +134,7 @@ def print_calendar(results):
     """
     min_score = results["fitness_score"].min()
     max_score = results["fitness_score"].max()
+    print(results.keys)
 
     for location, loc_df in results.groupby("location"):
         print(f"\n{'='*60}")
@@ -145,11 +149,24 @@ def print_calendar(results):
         precip_pivot = loc_df.pivot(index="model", columns="date", values="precip_mm")
         precip_pivot.columns = [d.strftime("%a %b %d") for d in precip_pivot.columns]
 
+        contrib_pivot = loc_df.pivot(index="model", columns="date", values="top_contributor")
+        contrib_pivot.columns = [d.strftime("%a %b %d") for d in contrib_pivot.columns]
+
+        temp_pivot = loc_df.pivot(index="model", columns="date", values="high_temp_c")
+        temp_pivot.columns = [d.strftime("%a %b %d") for d in temp_pivot.columns]
+
+        _CONTRIB_SHORT = {
+            "temperature":   "temp",
+            "cloud":         "cloud",
+            "wind":          "wind",
+            "precipitation": "precip",
+        }
+
         # Header row
         header = f"{'Model':<10}" + "".join(f"{col:>{col_width}}" for col in calendar.columns)
         print(header)
 
-        # Data rows: fitness score + precip beneath each model
+        # Data rows: fitness score + precip + top contributor beneath each model
         for model, row in calendar.iterrows():
             # Fitness score line
             line = f"{model:<10}"
@@ -161,6 +178,15 @@ def print_calendar(results):
                     line += f"{color}{score:>{col_width}.1f}{RESET}"
             print(line)
 
+            # Temperature line
+            tline = f"{'  high':<10}"
+            for t in temp_pivot.loc[model]:
+                if pd.isna(t):
+                    tline += f"{'  -  ':>{col_width}}"
+                else:
+                    tline += f"{f'{t:.1f}°C':>{col_width}}"
+            print(tline)
+
             # Precip line
             pline = f"{'  precip':<10}"
             for p in precip_pivot.loc[model]:
@@ -169,6 +195,15 @@ def print_calendar(results):
                 else:
                     pline += f"{'(' + f'{p:.1f}mm' + ')':>{col_width}}"
             print(pline)
+
+            # Top contributor line
+            cline = f"{'  driver':<10}"
+            for c in contrib_pivot.loc[model]:
+                if pd.isna(c):
+                    cline += f"{'  -  ':>{col_width}}"
+                else:
+                    cline += f"{'[' + _CONTRIB_SHORT.get(c, c) + ']':>{col_width}}"
+            print(cline)
 
 
 def score_to_rgb(score, min_score, max_score):
@@ -332,27 +367,45 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     Produce a calendar-style heatmap PNG: rows = locations, columns = dates,
     each cell shaded by the mean fitness score across models.
     """
-    min_score = results["fitness_score"].min()
-    max_score = results["fitness_score"].max()
-
+   
     gradient_stops = [
         (0.0,  0.78, 0.0),
         (1.0,  1.0,  0.0),
         (1.0,  0.65, 0.0),
         (0.86, 0.0,  0.0),
     ]
-    fitness_cmap = mcolors.LinearSegmentedColormap.from_list(
-        "fitness", gradient_stops, N=256
-    )
-    norm = mcolors.Normalize(vmin=min_score, vmax=max_score)
-
+  
     # Pivot to (location × date) matrix of mean scores
     daily_avg = (
         results.groupby(["location", "date"])["fitness_score"]
         .mean()
         .reset_index()
     )
+
+    # Most common top contributor across models for each (location, date)
+    daily_contrib = (
+        results.groupby(["location", "date"])["top_contributor"]
+        .agg(lambda x: x.mode().iloc[0])
+        .reset_index()
+    )
+
+    min_score = daily_avg["fitness_score"].min()
+    max_score = daily_avg["fitness_score"].max()
+
+    fitness_cmap = mcolors.LinearSegmentedColormap.from_list(
+        "fitness", gradient_stops, N=256
+    )
+    norm = mcolors.Normalize(vmin=min_score, vmax=max_score)
+
+    _CONTRIB_SHORT = {
+        "temperature":   "temp",
+        "cloud":         "cloud",
+        "wind":          "wind",
+        "precipitation": "precip",
+    }
+
     pivot = daily_avg.pivot(index="location", columns="date", values="fitness_score")
+    contrib_pivot = daily_contrib.pivot(index="location", columns="date", values="top_contributor")
     dates     = pivot.columns
     locations = pivot.index.tolist()
     n_locs = len(locations)
@@ -360,7 +413,7 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
 
     cell_w, cell_h = 1.0, 1.0
     fig_w = max(10, n_days * 0.9 + 3)
-    fig_h = n_locs * 1.4 + 0.6
+    fig_h = n_locs * 1 + 0.6
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
     ax.set_xlim(0, n_days)
     ax.set_ylim(0, n_locs)
@@ -382,8 +435,14 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
                                   facecolor=color, edgecolor="white", linewidth=1.5)
             ax.add_patch(rect)
             if not pd.isna(score):
-                ax.text(c + 0.5, y + 0.5, f"{score:.1f}",
+                ax.text(c + 0.5, y + 0.62, f"{score:.1f}",
                         ha="center", va="center", fontsize=11, color="black")
+                contrib = contrib_pivot.loc[loc_name, date] if (
+                    loc_name in contrib_pivot.index and date in contrib_pivot.columns
+                ) else None
+                if contrib and not pd.isna(contrib):
+                    ax.text(c + 0.5, y + 0.28, _CONTRIB_SHORT.get(contrib, contrib),
+                            ha="center", va="center", fontsize=8, color="#333333")
 
     # Column date labels + weekend highlight
     for c, date in enumerate(dates):
@@ -395,7 +454,7 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
                                        facecolor="none", edgecolor="green",
                                        linewidth=2.5, zorder=3))
 
-    plt.tight_layout(rect=[0, 0, 0.91, 0.97])
+    plt.tight_layout(rect=[0, 0.01, 0.91, 0.97])
 
     # Colorbar — added after tight_layout to avoid UserWarning
     cbar_ax = fig.add_axes([0.92, 0.25, 0.02, 0.45])
@@ -475,6 +534,7 @@ or reduce/stop these emails please contact your friendly neighborhood Luke</p>
 if __name__ == "__main__":
     all_data = fetch_all_data()
     results  = evaluate_all(all_data)
+    #print_calendar(results)
     plot_forecasts(all_data, results)
     plot_fitness_summary(results)
     send_images(SUMMARY_PNG, OUTPUT_PNG)

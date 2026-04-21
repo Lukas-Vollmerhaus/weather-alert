@@ -67,7 +67,10 @@ def evaluate_weather_fitness(weekend_data):
             with columns: CLOUD, TMP, WS, APCP
 
     Returns:
-        float: fitness score (lower is better)
+        tuple: (fitness_score, top_contributor) where fitness_score is a float
+            (lower is better) and top_contributor is the name of the weather
+            variable with the highest penalty contribution ("temperature",
+            "cloud", "wind", or "precipitation")
     '''
     avg_cloud, min_cloud, max_cloud = getAvgMinMax(weekend_data, "CLOUD")
     avg_temp, min_temp, max_temp = getAvgMinMax(weekend_data, "TMP")
@@ -78,22 +81,22 @@ def evaluate_weather_fitness(weekend_data):
     daily_precip = hourly_precip.groupby(weekend_data['DATETIME'].dt.date).sum()
     avg_daily_precip = daily_precip.mean()
     max_daily_precip = daily_precip.max()
+    
 
-    fitness = (
-        # Temperature: hard penalty if outside absolute limits, soft penalty based on distance from ideal
-        TEMP_STEP_WEIGHT * stepFunction(max_temp, MAX_TEMP, MIN_TEMP) +
-        TEMP_STEP_WEIGHT * triangleFunction(max_temp, IDEAL_TEMP_LOW, IDEAL_TEMP_HIGH, IDEAL_TEMP) +
-        # Cloud cover: soft penalty only (no hard cutoff defined)
-        CLOUD_TRI_WEIGHT * triangleFunction(avg_cloud, IDEAL_CLOUD_LOW, IDEAL_CLOUD_HIGH, IDEAL_CLOUD) +
-        # Wind speed: hard penalty if above max, soft penalty based on distance from ideal (calm)
-        WS_STEP_WEIGHT * stepFunction(avg_ws, MIN_WS, MAX_WS) +
-        WS_TRI_WEIGHT * triangleFunction(avg_ws, IDEAL_WS_LOW, IDEAL_WS_HIGH, IDEAL_WS) +
-        # Precipitation: evaluated on daily totals; max day drives hard threshold, avg drives soft
-        PRECIP_STEP_WEIGHT * stepFunction(max_daily_precip, MIN_PRECIP, MAX_PRECIP) +
-        PRECIP_TRI_WEIGHT * triangleFunction(avg_daily_precip, IDEAL_PRECIP_LOW, IDEAL_PRECIP_HIGH, IDEAL_PRECIP)
-    )
+    contributions = {
+        "temperature":   (TEMP_STEP_WEIGHT * stepFunction(max_temp, MIN_TEMP, MAX_TEMP) +
+                          TEMP_TRI_WEIGHT * triangleFunction(max_temp, IDEAL_TEMP_LOW, IDEAL_TEMP_HIGH, IDEAL_TEMP)),
+        "cloud":         (CLOUD_TRI_WEIGHT * triangleFunction(avg_cloud, IDEAL_CLOUD_LOW, IDEAL_CLOUD_HIGH, IDEAL_CLOUD)),
+        "wind":          (WS_STEP_WEIGHT * stepFunction(avg_ws, MIN_WS, MAX_WS) +
+                          WS_TRI_WEIGHT * triangleFunction(avg_ws, IDEAL_WS_LOW, IDEAL_WS_HIGH, IDEAL_WS)),
+        "precipitation": (PRECIP_STEP_WEIGHT * stepFunction(max_daily_precip, MIN_PRECIP, MAX_PRECIP) +
+                          PRECIP_TRI_WEIGHT * triangleFunction(max_daily_precip, IDEAL_PRECIP_LOW, IDEAL_PRECIP_HIGH, IDEAL_PRECIP)),
+    }
 
-    return fitness
+    fitness = sum(contributions.values())
+    top_contributor = max(contributions, key=contributions.get)
+    #print(contributions.values())
+    return fitness, top_contributor
 
 def getAvgMinMax(weekend_data, key):
     '''
@@ -120,7 +123,7 @@ def stepFunction(value, MIN_THRESHOLD, MAX_THRESHOLD):
 
     Used to apply a large, binary penalty when a weather variable exceeds acceptable limits.
     '''
-    if value < MAX_THRESHOLD and value > MIN_THRESHOLD:
+    if value <= MAX_THRESHOLD and value >= MIN_THRESHOLD:
         return 0
     else:
         return 1
