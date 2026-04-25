@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.colors as mcolors
 import matplotlib.cm as mcm
+import matplotlib.font_manager as _fm
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -17,8 +19,24 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email import encoders
+from PIL import Image, ImageDraw, ImageFont
 from model_data_fetch import load_locations, fetch_forecast, MODEL_CONFIG
 from weather_fitness import evaluate_weather_fitness, SEASON
+import emoji
+
+_SYMBOLA_PATH = "/home/lukas/miniconda3/envs/weather-alert/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/Symbola.ttf"
+_fm.fontManager.addfont(_SYMBOLA_PATH)
+
+_NOTO_COLOR_EMOJI_PATH = "/usr/local/src/weather-alert/NotoColorEmoji.ttf"
+_NOTO_EMOJI_FONT = ImageFont.truetype(_NOTO_COLOR_EMOJI_PATH, size=109)
+_EMOJI_IMAGE_CACHE: dict = {}
+
+def _emoji_image(char: str) -> np.ndarray:
+    if char not in _EMOJI_IMAGE_CACHE:
+        img = Image.new("RGBA", (136, 128), (0, 0, 0, 0))
+        ImageDraw.Draw(img).text((0, 0), char, font=_NOTO_EMOJI_FONT, embedded_color=True)
+        _EMOJI_IMAGE_CACHE[char] = np.array(img)
+    return _EMOJI_IMAGE_CACHE[char]
 
 OUTPUT_PNG  = "/tmp/weather_alert.png"
 SUMMARY_PNG = "/tmp/weather_alert_summary.png"
@@ -156,10 +174,10 @@ def print_calendar(results):
         temp_pivot.columns = [d.strftime("%a %b %d") for d in temp_pivot.columns]
 
         _CONTRIB_SHORT = {
-            "temperature":   "temp",
-            "cloud":         "cloud",
-            "wind":          "wind",
-            "precipitation": "precip",
+            "temperature":   emoji.emojize(":thermometer:"),
+            "cloud":         emoji.emojize(":cloud:"),
+            "wind":          emoji.emojize(":leaf_fluttering_in_wind:"),
+            "precipitation": emoji.emojize(":droplet:"),
         }
 
         # Header row
@@ -398,10 +416,10 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     norm = mcolors.Normalize(vmin=min_score, vmax=max_score)
 
     _CONTRIB_SHORT = {
-        "temperature":   "temp",
-        "cloud":         "cloud",
-        "wind":          "wind",
-        "precipitation": "precip",
+        "temperature":   "🌡️",
+        "cloud":         "☁️",
+        "wind":          "🍃",
+        "precipitation": "💧",
     }
 
     pivot = daily_avg.pivot(index="location", columns="date", values="fitness_score")
@@ -441,8 +459,13 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
                     loc_name in contrib_pivot.index and date in contrib_pivot.columns
                 ) else None
                 if contrib and not pd.isna(contrib):
-                    ax.text(c + 0.5, y + 0.28, _CONTRIB_SHORT.get(contrib, contrib),
-                            ha="center", va="center", fontsize=8, color="#333333")
+                    ch = _CONTRIB_SHORT.get(contrib, contrib)
+                    ab = AnnotationBbox(
+                        OffsetImage(_emoji_image(ch), zoom=0.2),
+                        (c + 0.5, y + 0.28),
+                        frameon=False, pad=0,
+                    )
+                    ax.add_artist(ab)
 
     # Column date labels + weekend highlight
     for c, date in enumerate(dates):
@@ -451,7 +474,7 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
                 ha="center", va="bottom", fontsize=10)
         if pd.Timestamp(date).dayofweek >= 5:  # 5=Saturday, 6=Sunday
             ax.add_patch(plt.Rectangle((c, 0), cell_w, n_locs,
-                                       facecolor="none", edgecolor="green",
+                                       facecolor="none", edgecolor="black",
                                        linewidth=2.5, zorder=3))
 
     plt.tight_layout(rect=[0, 0.01, 0.91, 0.97])
