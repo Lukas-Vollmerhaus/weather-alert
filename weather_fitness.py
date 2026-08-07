@@ -95,8 +95,7 @@ def evaluate_weather_fitness(weekend_data):
 
     fitness = sum(contributions.values())
     top_contributor = max(contributions, key=contributions.get)
-    #print(contributions.values())
-    return fitness, top_contributor
+    return fitness, top_contributor, contributions
 
 def getAvgMinMax(weekend_data, key):
     '''

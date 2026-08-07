@@ -94,22 +94,30 @@ def evaluate_all(all_data):
                 if len(day_data) < 2:
                     continue
                 try:
-                    score, top_contributor = evaluate_weather_fitness(day_data)
+                    score, top_contributor, contributions = evaluate_weather_fitness(day_data)
                 except Exception as e:
                     syslog.syslog(syslog.LOG_ERR, f"Could not score {loc_name} {model} {date}: {e}")
                     continue
                 daily_precip = day_data["APCP"].diff().fillna(0).sum()
                 daily_high_temp = day_data["TMP"].max()
                 records.append({
-                    "location":        loc_name,
-                    "model":           model,
-                    "date":            pd.Timestamp(date),
-                    "fitness_score":   score,
-                    "top_contributor": top_contributor,
-                    "precip_mm":       daily_precip,
-                    "high_temp_c":     daily_high_temp,
+                    "location":            loc_name,
+                    "model":               model,
+                    "date":                pd.Timestamp(date),
+                    "fitness_score":       score,
+                    "top_contributor":     top_contributor,
+                    "precip_mm":           daily_precip,
+                    "high_temp_c":         daily_high_temp,
+                    "score_temperature":   contributions["temperature"],
+                    "score_cloud":         contributions["cloud"],
+                    "score_wind":          contributions["wind"],
+                    "score_precipitation": contributions["precipitation"],
                 })
-    return pd.DataFrame(records, columns=["location", "model", "date", "fitness_score", "top_contributor", "precip_mm", "high_temp_c"])
+    return pd.DataFrame(records, columns=[
+        "location", "model", "date", "fitness_score", "top_contributor",
+        "precip_mm", "high_temp_c",
+        "score_temperature", "score_cloud", "score_wind", "score_precipitation",
+    ])
 
 
 def score_to_color(score, min_score, max_score):
@@ -383,27 +391,31 @@ def plot_forecasts(all_data, results, path=OUTPUT_PNG):
 def plot_fitness_summary(results, path=SUMMARY_PNG):
     """
     Produce a calendar-style heatmap PNG: rows = locations, columns = dates,
-    each cell shaded by the mean fitness score across models.
+    each cell shaded by mean fitness score and showing 5 lines of text:
+    temperature, cloud, wind, precipitation contributor scores, then total.
     """
-   
     gradient_stops = [
         (0.0,  0.78, 0.0),
         (1.0,  1.0,  0.0),
         (1.0,  0.65, 0.0),
         (0.86, 0.0,  0.0),
     ]
-  
-    # Pivot to (location × date) matrix of mean scores
+
+    CONTRIB_COLS = [
+        ("score_temperature",   "🌡️"),
+        ("score_cloud",         "☁️"),
+        ("score_wind",          "🍃"),
+        ("score_precipitation", "💧"),
+    ]
+
     daily_avg = (
         results.groupby(["location", "date"])["fitness_score"]
         .mean()
         .reset_index()
     )
-
-    # Most common top contributor across models for each (location, date)
-    daily_contrib = (
-        results.groupby(["location", "date"])["top_contributor"]
-        .agg(lambda x: x.mode().iloc[0])
+    daily_contribs = (
+        results.groupby(["location", "date"])[[col for col, _ in CONTRIB_COLS]]
+        .mean()
         .reset_index()
     )
 
@@ -415,71 +427,72 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     )
     norm = mcolors.Normalize(vmin=min_score, vmax=max_score)
 
-    _CONTRIB_SHORT = {
-        "temperature":   "🌡️",
-        "cloud":         "☁️",
-        "wind":          "🍃",
-        "precipitation": "💧",
-    }
-
     pivot = daily_avg.pivot(index="location", columns="date", values="fitness_score")
-    contrib_pivot = daily_contrib.pivot(index="location", columns="date", values="top_contributor")
+    contrib_pivots = {
+        col: daily_contribs.pivot(index="location", columns="date", values=col)
+        for col, _ in CONTRIB_COLS
+    }
     dates     = pivot.columns
     locations = pivot.index.tolist()
     n_locs = len(locations)
     n_days = len(dates)
 
-    cell_w, cell_h = 1.0, 1.0
-    fig_w = max(10, n_days * 0.9 + 3)
-    fig_h = n_locs * 1 + 0.6
+    cell_w, cell_h = 1.56, 1.92
+    total_h = n_locs * cell_h
+    fig_w = max(12, n_days * cell_w + 4)
+    fig_h = n_locs * cell_h + 1.8
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
-    ax.set_xlim(0, n_days)
-    ax.set_ylim(0, n_locs)
-    ax.set_aspect("equal")
+    ax.set_xlim(0, n_days * cell_w)
+    ax.set_ylim(0, total_h)
     ax.axis("off")
 
     fig.suptitle(f"Weather Quality by Location — {SEASON.title()}", fontsize=18,
                  fontweight="bold", y=0.995)
 
     for r, loc_name in enumerate(locations):
-        y = n_locs - r - 1  # top-to-bottom
-        # Row label
-        ax.text(-0.2, y + 0.5, loc_name, ha="right", va="center",
-                fontsize=13, fontweight="bold")
+        y = (n_locs - r - 1) * cell_h
+        ax.text(-0.2, y + cell_h / 2, loc_name, ha="right", va="center",
+                fontsize=26, fontweight="bold")
         for c, date in enumerate(dates):
+            cx = c * cell_w
             score = pivot.loc[loc_name, date]
             color = fitness_cmap(norm(score)) if not pd.isna(score) else "#cccccc"
-            rect = plt.Rectangle((c, y), cell_w, cell_h,
+            rect = plt.Rectangle((cx, y), cell_w, cell_h,
                                   facecolor=color, edgecolor="white", linewidth=1.5)
             ax.add_patch(rect)
             if not pd.isna(score):
-                ax.text(c + 0.5, y + 0.62, f"{score:.1f}",
-                        ha="center", va="center", fontsize=11, color="black")
-                contrib = contrib_pivot.loc[loc_name, date] if (
-                    loc_name in contrib_pivot.index and date in contrib_pivot.columns
-                ) else None
-                if contrib and not pd.isna(contrib):
-                    ch = _CONTRIB_SHORT.get(contrib, contrib)
+                line_spacing = 0.24
+                line_ys = [y + cell_h / 2 + (2 - i) * line_spacing for i in range(5)]
+                for i, (col, emoji) in enumerate(CONTRIB_COLS):
+                    cpivot = contrib_pivots[col]
+                    cval = (cpivot.loc[loc_name, date]
+                            if loc_name in cpivot.index and date in cpivot.columns
+                            else float("nan"))
                     ab = AnnotationBbox(
-                        OffsetImage(_emoji_image(ch), zoom=0.2),
-                        (c + 0.5, y + 0.28),
+                        OffsetImage(_emoji_image(emoji), zoom=0.18),
+                        (cx + 0.18, line_ys[i]),
                         frameon=False, pad=0,
                     )
                     ax.add_artist(ab)
+                    val_str = f"{cval:.2f}" if not pd.isna(cval) else "—"
+                    ax.text(cx + cell_w - 0.05, line_ys[i], val_str,
+                            ha="right", va="center", fontsize=9, color="black")
+                ax.text(cx + cell_w / 2, line_ys[4], f"∑  {score:.2f}",
+                        ha="center", va="center", fontsize=10, color="black",
+                        fontweight="bold")
 
-    # Column date labels + weekend highlight
     for c, date in enumerate(dates):
-        ax.text(c + 0.5, n_locs + 0.1,
+        cx = c * cell_w
+        ax.text(cx + cell_w / 2, total_h + 0.1,
                 pd.Timestamp(date).strftime("%a\n%b %d"),
-                ha="center", va="bottom", fontsize=10)
-        if pd.Timestamp(date).dayofweek >= 5:  # 5=Saturday, 6=Sunday
-            ax.add_patch(plt.Rectangle((c, 0), cell_w, n_locs,
+                ha="center", va="bottom", fontsize=20)
+        if pd.Timestamp(date).dayofweek >= 5:
+            ax.add_patch(plt.Rectangle((cx, 0), cell_w, total_h,
                                        facecolor="none", edgecolor="black",
                                        linewidth=2.5, zorder=3))
 
     plt.tight_layout(rect=[0, 0.01, 0.91, 0.97])
 
-    # Colorbar — added after tight_layout to avoid UserWarning
     cbar_ax = fig.add_axes([0.92, 0.25, 0.02, 0.45])
     cb = fig.colorbar(mcm.ScalarMappable(norm=norm, cmap=fitness_cmap),
                       cax=cbar_ax, orientation="vertical")
@@ -488,15 +501,15 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     cb.ax.tick_params(labelsize=10)
     fig.text(0.5, 0.002, f"Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}",
              ha="center", va="bottom", fontsize=10, color="grey")
-    fig.savefig(path, dpi=150, bbox_inches="tight")
+    fig.savefig(path, dpi=180, bbox_inches="tight")
     plt.close(fig)
     syslog.syslog(syslog.LOG_INFO, f"Saved summary plot to {path}")
 
 
-def send_images(summary_png, detail_png, path=EMAIL_CONF):
+def send_images(summary_png, path=EMAIL_CONF):
     """
     Send the weather quality summary image inline in the email body,
-    with the detail plot and conf files attached.
+    with conf files attached.
     """
     cfg = configparser.ConfigParser()
     cfg.read(path)
@@ -534,8 +547,8 @@ or reduce/stop these emails please contact your friendly neighborhood Luke</p>
         img.add_header("Content-Disposition", "inline")
         msg.attach(img)
 
-        # Attachments: detail plot and conf files
-        for attach_path in [detail_png, LOCATIONS_CONF, FITNESS_CONF_PATH]:
+        # Attachments: conf files
+        for attach_path in [LOCATIONS_CONF, FITNESS_CONF_PATH]:
             with open(attach_path, "rb") as f:
                 part = MIMEBase("application", "octet-stream")
                 part.set_payload(f.read())
@@ -558,6 +571,5 @@ if __name__ == "__main__":
     all_data = fetch_all_data()
     results  = evaluate_all(all_data)
     #print_calendar(results)
-    plot_forecasts(all_data, results)
     plot_fitness_summary(results)
-    send_images(SUMMARY_PNG, OUTPUT_PNG)
+    send_images(SUMMARY_PNG)
