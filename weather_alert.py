@@ -20,9 +20,15 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email import encoders
 from PIL import Image, ImageDraw, ImageFont
+from adjustText import adjust_text
 from model_data_fetch import load_locations, fetch_forecast, MODEL_CONFIG
 from weather_fitness import evaluate_weather_fitness, SEASON
 import emoji
+import io
+import math
+import time
+import requests
+import matplotlib.patheffects as pe
 
 _SYMBOLA_PATH = "/home/lukas/miniconda3/envs/weather-alert/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/Symbola.ttf"
 _fm.fontManager.addfont(_SYMBOLA_PATH)
@@ -40,6 +46,7 @@ def _emoji_image(char: str) -> np.ndarray:
 
 OUTPUT_PNG  = "/tmp/weather_alert.png"
 SUMMARY_PNG = "/tmp/weather_alert_summary.png"
+MAP_PNG     = "/tmp/weather_alert_map.png"
 
 EMAIL_CONF        = "/usr/local/src/weather-alert/email.conf"
 LOCATIONS_CONF    = "/usr/local/src/weather-alert/locations.conf"
@@ -388,7 +395,7 @@ def plot_forecasts(all_data, results, path=OUTPUT_PNG):
     syslog.syslog(syslog.LOG_INFO, f"Saved detail plot to {path}")
 
 
-def plot_fitness_summary(results, path=SUMMARY_PNG):
+def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
     """
     Produce a calendar-style heatmap PNG: rows = locations, columns = dates,
     each cell shaded by mean fitness score and showing 5 lines of text:
@@ -433,6 +440,12 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
         for col, _ in CONTRIB_COLS
     }
     dates     = pivot.columns
+    if location_order is not None:
+        pivot = pivot.reindex([l for l in location_order if l in pivot.index])
+        for col in contrib_pivots:
+            contrib_pivots[col] = contrib_pivots[col].reindex(
+                [l for l in location_order if l in contrib_pivots[col].index]
+            )
     locations = pivot.index.tolist()
     n_locs = len(locations)
     n_days = len(dates)
@@ -506,7 +519,87 @@ def plot_fitness_summary(results, path=SUMMARY_PNG):
     syslog.syslog(syslog.LOG_INFO, f"Saved summary plot to {path}")
 
 
-def send_images(summary_png, path=EMAIL_CONF):
+def _deg2tile(lat, lon, zoom):
+    n = 2 ** zoom
+    x = int((lon + 180.0) / 360.0 * n)
+    lat_r = math.radians(lat)
+    y = int((1.0 - math.log(math.tan(lat_r) + 1.0 / math.cos(lat_r)) / math.pi) / 2.0 * n)
+    return x, y
+
+
+def _tile2lonlat(x, y, zoom):
+    n = 2 ** zoom
+    lon = x / n * 360.0 - 180.0
+    lat = math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n))))
+    return lon, lat
+
+
+def plot_location_map(locations, path=MAP_PNG):
+    lats = [loc.lat for loc in locations]
+    lons = [loc.long for loc in locations]
+    pad = 0.4
+    min_lat, max_lat = min(lats) - pad, max(lats) + pad
+    min_lon, max_lon = min(lons) - pad, max(lons) + pad
+
+    zoom = 8
+    x_min, y_min = _deg2tile(max_lat, min_lon, zoom)
+    x_max, y_max = _deg2tile(min_lat, max_lon, zoom)
+
+    tile_size = 256
+    cols = x_max - x_min + 1
+    rows = y_max - y_min + 1
+    stitched = Image.new("RGB", (cols * tile_size, rows * tile_size))
+
+    headers = {"User-Agent": "Mozilla/5.0"}
+    for ty in range(y_min, y_max + 1):
+        for tx in range(x_min, x_max + 1):
+            url = f"https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{zoom}/{ty}/{tx}"
+            try:
+                resp = requests.get(url, headers=headers, timeout=15)
+                resp.raise_for_status()
+                tile_img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+            except Exception as e:
+                syslog.syslog(syslog.LOG_ERR, f"Map tile {zoom}/{tx}/{ty} failed: {e}")
+                tile_img = Image.new("RGB", (tile_size, tile_size), (200, 200, 200))
+            stitched.paste(tile_img, ((tx - x_min) * tile_size, (ty - y_min) * tile_size))
+            time.sleep(0.1)
+
+    nw_lon, nw_lat = _tile2lonlat(x_min, y_min, zoom)
+    se_lon, se_lat = _tile2lonlat(x_max + 1, y_max + 1, zoom)
+
+    fig, ax = plt.subplots(figsize=(12, 9))
+    ax.imshow(np.array(stitched),
+              extent=[nw_lon, se_lon, se_lat, nw_lat],
+              aspect="auto", origin="upper")
+    ax.set_xlim(min_lon, max_lon)
+    ax.set_ylim(min_lat, max_lat)
+    ax.axis("off")
+
+    outline = [pe.withStroke(linewidth=3, foreground="white")]
+    texts = []
+    for loc in locations:
+        ax.plot(loc.long, loc.lat, "o", color="#d62728", markersize=8, zorder=5,
+                markeredgecolor="white", markeredgewidth=1.5)
+        t = ax.text(loc.long, loc.lat, loc.name,
+                    fontsize=10, fontweight="bold", color="black", zorder=6,
+                    path_effects=outline)
+        texts.append(t)
+    adjust_text(
+        texts,
+        x=[loc.long for loc in locations],
+        y=[loc.lat for loc in locations],
+        ax=ax,
+        arrowprops=dict(arrowstyle="-", color="black", lw=0.8),
+        expand=(1.3, 1.5),
+    )
+
+    fig.suptitle("Forecast Locations", fontsize=14, fontweight="bold")
+    fig.savefig(path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    syslog.syslog(syslog.LOG_INFO, f"Saved location map to {path}")
+
+
+def send_images(summary_png, map_png, path=EMAIL_CONF):
     """
     Send the weather quality summary image inline in the email body,
     with conf files attached.
@@ -527,6 +620,8 @@ def send_images(summary_png, path=EMAIL_CONF):
 or reduce/stop these emails please contact your friendly neighborhood Luke</p>
 <br>
 <img src="cid:summary_image" width="50%">
+<br><br>
+<img src="cid:map_image" width="50%">
 """
 
     for recipient in recipients:
@@ -546,6 +641,13 @@ or reduce/stop these emails please contact your friendly neighborhood Luke</p>
         img.add_header("Content-ID", "<summary_image>")
         img.add_header("Content-Disposition", "inline")
         msg.attach(img)
+
+        # Inline map image
+        with open(map_png, "rb") as f:
+            mimg = MIMEImage(f.read())
+        mimg.add_header("Content-ID", "<map_image>")
+        mimg.add_header("Content-Disposition", "inline")
+        msg.attach(mimg)
 
         # Attachments: conf files
         for attach_path in [LOCATIONS_CONF, FITNESS_CONF_PATH]:
@@ -568,8 +670,21 @@ or reduce/stop these emails please contact your friendly neighborhood Luke</p>
 
 
 if __name__ == "__main__":
-    all_data = fetch_all_data()
-    results  = evaluate_all(all_data)
+    locations = load_locations()
+    all_data  = fetch_all_data()
+    results   = evaluate_all(all_data)
     #print_calendar(results)
-    plot_fitness_summary(results)
-    send_images(SUMMARY_PNG)
+    calgary = next((loc for loc in locations if loc.name == "Calgary"), None)
+    if calgary:
+        locations_sorted = sorted(
+            locations,
+            key=lambda loc: math.sqrt(
+                (loc.lat - calgary.lat) ** 2 + (loc.long - calgary.long) ** 2
+            ),
+        )
+    else:
+        locations_sorted = locations
+    location_order = [loc.name for loc in locations_sorted]
+    plot_fitness_summary(results, location_order=location_order)
+    plot_location_map(locations_sorted)
+    send_images(SUMMARY_PNG, MAP_PNG)
