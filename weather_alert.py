@@ -21,8 +21,10 @@ from email.mime.image import MIMEImage
 from email import encoders
 from PIL import Image, ImageDraw, ImageFont
 from adjustText import adjust_text
-from model_data_fetch import load_locations, fetch_forecast, MODEL_CONFIG
-from weather_fitness import evaluate_weather_fitness, SEASON
+from model_data_fetch import load_locations, fetch_forecast, fetch_avalanche, MODEL_CONFIG
+from weather_fitness import (evaluate_weather_fitness, avalanche_penalty,
+                             avalanche_enabled, snowflake_count, recent_snow_days,
+                             SIG_SNOW_THRESHOLDS, SEASON)
 import emoji
 import io
 import math
@@ -36,6 +38,13 @@ _fm.fontManager.addfont(_SYMBOLA_PATH)
 _NOTO_COLOR_EMOJI_PATH = "/usr/local/src/weather-alert/NotoColorEmoji.ttf"
 _NOTO_EMOJI_FONT = ImageFont.truetype(_NOTO_COLOR_EMOJI_PATH, size=109)
 _EMOJI_IMAGE_CACHE: dict = {}
+
+# EAWS dry-snow danger icon (from avalanches.org/downloads, level digit removed),
+# shown beside the avalanche sub-score on the summary graphic
+AVALANCHE_ICON_PATH = "/usr/local/src/weather-alert/icons/avalanche.png"
+
+# Avalanche symbol for the terminal calendar, and fallback for the graphic
+AVALANCHE_EMOJI = "🏔️"
 
 def _emoji_image(char: str) -> np.ndarray:
     if char not in _EMOJI_IMAGE_CACHE:
@@ -54,18 +63,31 @@ FITNESS_CONF_PATH = "/usr/local/src/weather-alert/weather_fitness.conf"
 
 RESET = "\033[0m"
 
+# Timezone the forecasts are requested in; decides which day is "today"
+LOCAL_TZ = "America/Edmonton"
+
 # Colour assigned to each model in plots
 MODEL_COLORS = {
     "GDPS": "#1f77b4",
     "RDPS": "#ff7f0e",
     "GFS":  "#2ca02c",
-    "NAM":  "#d62728",
+    "HRDPS": "#d62728",
 }
+
+
+def _avalanche_icon() -> np.ndarray:
+    """Avalanche icon as an RGBA array, falling back to the emoji if the file is missing."""
+    try:
+        return np.array(Image.open(AVALANCHE_ICON_PATH).convert("RGBA"))
+    except OSError as e:
+        syslog.syslog(syslog.LOG_WARNING, f"Avalanche icon unavailable, using emoji: {e}")
+        return _emoji_image(AVALANCHE_EMOJI)
 
 
 def fetch_all_data():
     """
     Fetch raw hourly forecast DataFrames for every location/model combination.
+    Includes the days of history the recent-snow fitness term needs.
 
     Returns:
         dict: {location_name: {model: pd.DataFrame or None}}
@@ -77,36 +99,86 @@ def fetch_all_data():
         for model in MODEL_CONFIG:
             syslog.syslog(syslog.LOG_INFO, f"Fetching {model} for {loc.name}")
             try:
-                all_data[loc.name][model] = fetch_forecast(loc, model)
+                all_data[loc.name][model] = fetch_forecast(loc, model, past_days=recent_snow_days())
             except Exception as e:
                 syslog.syslog(syslog.LOG_ERR, f"Failed to fetch {model} for {loc.name}: {e}")
                 all_data[loc.name][model] = None
     return all_data
 
 
-def evaluate_all(all_data):
+def fetch_all_avalanche():
+    """
+    Fetch avalanche danger ratings for every location. Skipped (empty dict)
+    when the fitness config has no [avalanche] section.
+
+    Returns:
+        dict: {location_name: {date: {"alp": str, "tln": str, "btl": str}}}
+        A location with no ratings at all (outside every forecast region, or
+        the fetch failed) gives {} so every day scores as "unknown".
+    """
+    avalanche_data = {}
+    if not avalanche_enabled():
+        return avalanche_data
+    for loc in load_locations():
+        syslog.syslog(syslog.LOG_INFO, f"Fetching avalanche forecast for {loc.name}")
+        try:
+            avalanche_data[loc.name] = fetch_avalanche(loc) or {}
+        except Exception as e:
+            syslog.syslog(syslog.LOG_ERR, f"Failed to fetch avalanche forecast for {loc.name}: {e}")
+            avalanche_data[loc.name] = {}
+    return avalanche_data
+
+
+def evaluate_all(all_data, avalanche_data=None):
     """
     Evaluate daily fitness scores from pre-fetched data.
+
+    Parameters:
+        all_data: output of fetch_all_data()
+        avalanche_data: output of fetch_all_avalanche(). When avalanche
+            scoring is enabled, any location or day without a rating scores
+            the "unknown" penalty, never zero.
 
     Returns:
         pd.DataFrame with columns: location, model, date, fitness_score
     """
+    avalanche_data = avalanche_data or {}
+    today = pd.Timestamp.now(tz=LOCAL_TZ).date()
+    n_recent = recent_snow_days()
     records = []
     for loc_name, models in all_data.items():
+        use_avalanche = avalanche_enabled()
+        loc_avalanche = avalanche_data.get(loc_name) or {}
         for model, df in models.items():
             if df is None:
                 continue
+            blank_days = 0
+            daily_snow_by_date = (df.groupby(df["DATETIME"].dt.date)["SNOW"].sum(min_count=1)
+                                  if "SNOW" in df else pd.Series(dtype=float))
             for date, day_data in df.groupby(df["DATETIME"].dt.date):
+                if date < today:
+                    continue   # history is only there to feed the recent-snow term
+                recent_snow = [daily_snow_by_date.get(date - pd.Timedelta(days=k), float("nan"))
+                               for k in range(1, n_recent + 1)]
                 day_data = day_data.reset_index(drop=True)
                 if len(day_data) < 2:
                     continue
+                # A model can answer with every value blank (e.g. outside its
+                # coverage). Leave that day to the other models instead of
+                # scoring the blanks as threshold violations.
+                if day_data[["TMP", "CLOUD", "WS"]].isna().all().any():
+                    blank_days += 1
+                    continue
+                avalanche = (avalanche_penalty(loc_avalanche.get(date))
+                             if use_avalanche else 0.0)
                 try:
-                    score, top_contributor, contributions = evaluate_weather_fitness(day_data)
+                    score, top_contributor, contributions = evaluate_weather_fitness(day_data, avalanche, recent_snow)
                 except Exception as e:
                     syslog.syslog(syslog.LOG_ERR, f"Could not score {loc_name} {model} {date}: {e}")
                     continue
                 daily_precip = day_data["APCP"].diff().fillna(0).sum()
                 daily_high_temp = day_data["TMP"].max()
+                daily_snow = day_data["SNOW"].sum() if "SNOW" in day_data else float("nan")
                 records.append({
                     "location":            loc_name,
                     "model":               model,
@@ -115,15 +187,21 @@ def evaluate_all(all_data):
                     "top_contributor":     top_contributor,
                     "precip_mm":           daily_precip,
                     "high_temp_c":         daily_high_temp,
+                    "snow_cm":             daily_snow,
                     "score_temperature":   contributions["temperature"],
                     "score_cloud":         contributions["cloud"],
                     "score_wind":          contributions["wind"],
                     "score_precipitation": contributions["precipitation"],
+                    "score_avalanche":     contributions["avalanche"],
                 })
+            if blank_days:
+                syslog.syslog(syslog.LOG_WARNING,
+                              f"{model} returned no data for {loc_name} on {blank_days} day(s); skipped")
     return pd.DataFrame(records, columns=[
         "location", "model", "date", "fitness_score", "top_contributor",
-        "precip_mm", "high_temp_c",
+        "precip_mm", "high_temp_c", "snow_cm",
         "score_temperature", "score_cloud", "score_wind", "score_precipitation",
+        "score_avalanche",
     ])
 
 
@@ -193,6 +271,7 @@ def print_calendar(results):
             "cloud":         emoji.emojize(":cloud:"),
             "wind":          emoji.emojize(":leaf_fluttering_in_wind:"),
             "precipitation": emoji.emojize(":droplet:"),
+            "avalanche":     AVALANCHE_EMOJI,
         }
 
         # Header row
@@ -398,8 +477,13 @@ def plot_forecasts(all_data, results, path=OUTPUT_PNG):
 def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
     """
     Produce a calendar-style heatmap PNG: rows = locations, columns = dates,
-    each cell shaded by mean fitness score and showing 5 lines of text:
-    temperature, cloud, wind, precipitation contributor scores, then total.
+    each cell shaded by mean fitness score and showing one line per contributor
+    score (temperature, cloud, wind, precipitation, plus avalanche when the
+    fitness config enables it), then the total.
+
+    When the fitness config defines sig_snow_N thresholds, each cell gets head
+    room at the top holding one snowflake per threshold reached by the day's
+    snowfall (mean across models). The snowflakes are not part of the score.
     """
     gradient_stops = [
         (0.0,  0.78, 0.0),
@@ -409,11 +493,13 @@ def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
     ]
 
     CONTRIB_COLS = [
-        ("score_temperature",   "🌡️"),
-        ("score_cloud",         "☁️"),
-        ("score_wind",          "🍃"),
-        ("score_precipitation", "💧"),
+        ("score_temperature",   _emoji_image("🌡️")),
+        ("score_cloud",         _emoji_image("☁️")),
+        ("score_wind",          _emoji_image("🍃")),
+        ("score_precipitation", _emoji_image("💧")),
     ]
+    if avalanche_enabled():
+        CONTRIB_COLS.append(("score_avalanche", _avalanche_icon()))
 
     daily_avg = (
         results.groupby(["location", "date"])["fitness_score"]
@@ -428,6 +514,13 @@ def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
 
     min_score = daily_avg["fitness_score"].min()
     max_score = daily_avg["fitness_score"].max()
+
+    show_snow = bool(SIG_SNOW_THRESHOLDS) and "snow_cm" in results
+    if show_snow:
+        snow_pivot = (results.groupby(["location", "date"])["snow_cm"].mean()
+                      .unstack("date"))
+        snowflake = _emoji_image("❄️")
+    snow_head = 0.42 if show_snow else 0.0   # head room at the top of each cell
 
     fitness_cmap = mcolors.LinearSegmentedColormap.from_list(
         "fitness", gradient_stops, N=256
@@ -450,7 +543,7 @@ def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
     n_locs = len(locations)
     n_days = len(dates)
 
-    cell_w, cell_h = 1.56, 1.92
+    cell_w, cell_h = 1.56, 1.92 + snow_head
     total_h = n_locs * cell_h
     fig_w = max(12, n_days * cell_w + 4)
     fig_h = n_locs * cell_h + 1.8
@@ -475,14 +568,29 @@ def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
             ax.add_patch(rect)
             if not pd.isna(score):
                 line_spacing = 0.24
-                line_ys = [y + cell_h / 2 + (2 - i) * line_spacing for i in range(5)]
-                for i, (col, emoji) in enumerate(CONTRIB_COLS):
+                n_lines = len(CONTRIB_COLS) + 1
+                lines_mid = y + (cell_h - snow_head) / 2
+                line_ys = [lines_mid + ((n_lines - 1) / 2 - i) * line_spacing
+                           for i in range(n_lines)]
+                if show_snow:
+                    snow_cm = (snow_pivot.loc[loc_name, date]
+                               if loc_name in snow_pivot.index and date in snow_pivot.columns
+                               else float("nan"))
+                    n_flakes = snowflake_count(snow_cm)
+                    for j in range(n_flakes):
+                        fx = cx + cell_w / 2 + (j - (n_flakes - 1) / 2) * 0.36
+                        ax.add_artist(AnnotationBbox(
+                            OffsetImage(snowflake, zoom=0.2),
+                            (fx, y + cell_h - 0.08 - snow_head / 2),
+                            frameon=False, pad=0,
+                        ))
+                for i, (col, icon) in enumerate(CONTRIB_COLS):
                     cpivot = contrib_pivots[col]
                     cval = (cpivot.loc[loc_name, date]
                             if loc_name in cpivot.index and date in cpivot.columns
                             else float("nan"))
                     ab = AnnotationBbox(
-                        OffsetImage(_emoji_image(emoji), zoom=0.18),
+                        OffsetImage(icon, zoom=0.18),
                         (cx + 0.18, line_ys[i]),
                         frameon=False, pad=0,
                     )
@@ -490,7 +598,7 @@ def plot_fitness_summary(results, location_order=None, path=SUMMARY_PNG):
                     val_str = f"{cval:.2f}" if not pd.isna(cval) else "—"
                     ax.text(cx + cell_w - 0.05, line_ys[i], val_str,
                             ha="right", va="center", fontsize=9, color="black")
-                ax.text(cx + cell_w / 2, line_ys[4], f"∑  {score:.2f}",
+                ax.text(cx + cell_w / 2, line_ys[-1], f"∑  {score:.2f}",
                         ha="center", va="center", fontsize=10, color="black",
                         fontweight="bold")
 
@@ -672,7 +780,8 @@ or reduce/stop these emails please contact your friendly neighborhood Luke</p>
 if __name__ == "__main__":
     locations = load_locations()
     all_data  = fetch_all_data()
-    results   = evaluate_all(all_data)
+    avalanche_data = fetch_all_avalanche()
+    results   = evaluate_all(all_data, avalanche_data)
     #print_calendar(results)
     calgary = next((loc for loc in locations if loc.name == "Calgary"), None)
     if calgary:

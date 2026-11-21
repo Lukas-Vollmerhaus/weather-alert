@@ -2,13 +2,14 @@
 """
 Fetch hourly weather forecast data from the Open-Meteo API for a given location
 and model. Returns a DataFrame with columns matching the rest of the codebase:
-    DATETIME, TMP, CLOUD, WS, APCP
+    DATETIME, TMP, CLOUD, WS, APCP, SNOW, RAIN
 
 Supported models and their Open-Meteo identifiers:
     GDPS  -> gem_global    (Canadian Global, ~15 km, 10-day)
     RDPS  -> gem_regional  (Canadian Regional, ~10 km, 3.5-day)
     GFS   -> gfs_seamless  (American Global, ~25 km, 16-day)
-    NAM   -> nam_conus     (North American Mesoscale, ~3 km, 60-hour)
+    HRDPS -> gem_hrdps_continental (Canadian High Resolution, ~2.5 km, 48-hour;
+             replaced NAM, which NOAA retired on 2026-11-03)
 """
 
 import configparser
@@ -28,25 +29,34 @@ MODEL_CONFIG = {
     "GDPS": (GEM_ENDPOINT,      "gem_global",      10),
     "RDPS": (GEM_ENDPOINT,      "gem_regional",     3),
     "GFS":  (FORECAST_ENDPOINT, "gfs_seamless",    10),
-    "NAM":  (FORECAST_ENDPOINT, "ncep_nam_conus",   3),
+    "HRDPS": (GEM_ENDPOINT,     "gem_hrdps_continental", 2),
 }
 
-HOURLY_VARS    = "temperature_2m,cloud_cover,wind_speed_10m,precipitation"
+HOURLY_VARS    = "temperature_2m,cloud_cover,wind_speed_10m,precipitation,snowfall,rain,showers"
 FETCH_TIMEOUT  = 120
 FETCH_ATTEMPTS = 10
 
+# Avalanche Canada point forecast (no API key needed)
+AVALANCHE_ENDPOINT = "https://api.avalanche.ca/forecasts/en/products/point"
+AVALANCHE_BANDS    = ("alp", "tln", "btl")   # alpine, treeline, below treeline
+AVALANCHE_TIMEOUT  = 30
+AVALANCHE_TZ       = "America/Edmonton"      # fallback if the report has no timezone
 
-def fetch_forecast(location, model):
+
+def fetch_forecast(location, model, past_days=0):
     """
     Fetch hourly forecast data from Open-Meteo for a single location and model.
 
     Parameters:
         location: object with .lat (float), .long (float), .name (str)
-        model (str): one of "GDPS", "RDPS", "GFS", "NAM"
+        model (str): one of "GDPS", "RDPS", "GFS", "HRDPS"
+        past_days (int): days of model history to include before today
 
     Returns:
-        pd.DataFrame with columns: DATETIME, TMP, CLOUD, WS, APCP
+        pd.DataFrame with columns: DATETIME, TMP, CLOUD, WS, APCP, SNOW
             APCP is accumulated precipitation (running cumulative sum of hourly values, mm)
+            SNOW is hourly snowfall (cm, not accumulated)
+            RAIN is hourly liquid precipitation, rain + showers (mm, not accumulated)
 
     Raises:
         ValueError: if model name is not recognised
@@ -63,6 +73,7 @@ def fetch_forecast(location, model):
         "hourly":         HOURLY_VARS,
         "models":         model_id,
         "forecast_days":  forecast_days,
+        "past_days":      past_days,
         "wind_speed_unit": "kmh",   # keep consistent with existing threshold constants (km/h)
         "timezone":       "America/Edmonton",
     }
@@ -89,6 +100,9 @@ def fetch_forecast(location, model):
         "WS":       hourly["wind_speed_10m"],
         # Accumulate hourly precipitation into a running total, matching APCP convention
         "APCP":     pd.Series(hourly["precipitation"]).cumsum().values,
+        "SNOW":     pd.to_numeric(pd.Series(hourly["snowfall"]), errors="coerce").values,
+        "RAIN":     (pd.to_numeric(pd.Series(hourly["rain"]), errors="coerce") +
+                     pd.to_numeric(pd.Series(hourly["showers"]), errors="coerce")).values,
     })
 
     return df
@@ -115,6 +129,46 @@ def fetch_all_models(location):
     return results
 
 
+def fetch_avalanche(location):
+    """
+    Fetch the Avalanche Canada danger ratings for the forecast region that
+    contains a location.
+
+    Parameters:
+        location: object with .lat (float), .long (float), .name (str)
+
+    Returns:
+        None if the location is outside every avalanche forecast region.
+        Otherwise a dict mapping datetime.date -> {"alp": str, "tln": str, "btl": str}
+        holding the rating value for each elevation band (e.g. "low", "moderate",
+        "considerable", "high", "extreme", "earlyseason", "norating"). The dict
+        only covers the days the forecast rates (about 3) and can be empty.
+
+    Raises:
+        requests.HTTPError: if the API returns an error status
+    """
+    params = {"lat": location.lat, "long": location.long}
+    response = requests.get(AVALANCHE_ENDPOINT, params=params, timeout=AVALANCHE_TIMEOUT)
+    response.raise_for_status()
+    data = response.json() or {}
+
+    # Points outside every region come back as HTTP 200 with all fields blank
+    if not (data.get("area") or {}).get("id"):
+        return None
+
+    report = data.get("report") or {}
+    tz = report.get("timezone") or AVALANCHE_TZ
+
+    ratings = {}
+    for day in report.get("dangerRatings") or []:
+        date = pd.Timestamp(day["date"]["value"]).tz_convert(tz).date()
+        ratings[date] = {
+            band: day["ratings"][band]["rating"]["value"]
+            for band in AVALANCHE_BANDS
+        }
+    return ratings
+
+
 def load_locations(path=LOCATIONS_CONF):
     config = configparser.ConfigParser()
     config.read(path)
@@ -137,3 +191,4 @@ if __name__ == "__main__":
                 print(f"  {model}: {len(df)} hours, "
                       f"temp range {df['TMP'].min():.1f}–{df['TMP'].max():.1f} °C, "
                       f"total precip {df['APCP'].iloc[-1]:.1f} mm")
+        print(f"  avalanche: {fetch_avalanche(loc)}")
